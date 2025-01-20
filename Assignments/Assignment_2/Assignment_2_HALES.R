@@ -1,5 +1,6 @@
 #4. Write a command that lists all the .csv files found in the Data/ directory
 #Store that list as csv_files
+getwd()
 csv_files <- 
 list.files(path = "data", pattern = ".csv", all.files = TRUE, 
            full.names = TRUE, recursive = TRUE)
