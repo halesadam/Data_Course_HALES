@@ -1,0 +1,9 @@
+For the final project, I have some phenotypic data from my research with Yuya that I need to analyze and create figures for so we can prepare for publication. This data is numerical disease evaluation scores for roughly 200 unique plant accessions that we screened for virus disease resistance. Together, I have three replicates each for five disease evaluations across two growing seasons. 
+
+In the project, I want to be able to analyze the significance of this data, look for correlations, and to create figures that will help me to tell a story with these data. 
+
+The plot that I have included here in Assignment 4 is just a rough visualization of the mean Disease Severity Rating (DSR) score for all accessions. 
+
+I also have data regarding accession species and subspecies, origin, and prior breeding for disease resistance that would be really interesting to plot and analyze later on. 
+
+Based on the figure, we can see that the accessions with ID 50 to roughly 150 had the lowest average DSR scores, and I will have to dig into the details of those accessions that could uncover a correlation between origin/species and DSR scores. 
