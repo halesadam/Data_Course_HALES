@@ -70,9 +70,9 @@ ggplot(us_cumulative_deaths, aes(x = Last_Update, y = Cumulative_Deaths)) +
   ) +
   theme_minimal() +  
   theme(
-    plot.title = element_text(face = "bold", size = 13, hjust = 0.5),  # Bold and centered title
-    axis.title.x = element_text(face = "bold", size = 10),  # Bold x-axis label
-    axis.title.y = element_text(face = "bold", size = 10),  # Bold y-axis label
-    axis.text.x = element_text(angle = 45, hjust = 1), # Rotate x-axis labels for readability
+    plot.title = element_text(face = "bold", size = 13, hjust = 0.5), 
+    axis.title.x = element_text(face = "bold", size = 10),
+    axis.title.y = element_text(face = "bold", size = 10),  
+    axis.text.x = element_text(angle = 45, hjust = 1), 
   )
 
