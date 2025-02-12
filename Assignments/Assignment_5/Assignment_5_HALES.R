@@ -3,7 +3,8 @@ library(ggplot2)
 library(ggimage)
 
 image_path <- "https://i1.sndcdn.com/artworks-000338100936-kt6c6s-t500x500.jpg"
-small_ugly_data <- read.csv("Assignments/Assignment_5/Small_Ugly_Dataset_copy.csv")  
+
+small_ugly_data <- read.csv("Small_Ugly_Dataset_copy.csv")
 
 p1 <- ggplot(small_ugly_data, aes(x = X1, y = X2, color = Category, shape = as.factor(X3), size = X3)) +
   geom_point(alpha = 1) +
