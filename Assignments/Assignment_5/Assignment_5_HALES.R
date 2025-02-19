@@ -26,4 +26,6 @@ p1 <- ggplot(small_ugly_data, aes(x = X1, y = X2, color = Category, shape = as.f
         strip.text = element_text(color = "blue", face = "italic")) +  
   annotate("text", x = 50, y = 150, label = "jUnK", color = "darkgrey", size = 10) 
 
-ggbackground(p1, image_path)
+plot <- ggbackground(p1, image_path)
+plot
+ggsave("ugly_plot.jpg", plot = plot)
