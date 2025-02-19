@@ -3,7 +3,7 @@ library(gganimate)
 
 #Part 1
 df <- read.csv("BioLog_Plate_Data_copy.csv")
-dat <- read.csv("../../Data/BioLog_Plate_Data.csv")
+# dat <- read.csv("../../Data/BioLog_Plate_Data.csv") which way?
 
 #lengthen df
 df_long <- df %>% 
@@ -29,7 +29,7 @@ ggplot(filtered_df) +
   aes(x = Time, 
       y = Absorbance,
       color = Type) +
-  geom_smooth(method = "loess", se = FALSE, linewidth = 0.5) +
+ geom_smooth(method = "loess", se = FALSE, linewidth = 0.5) +
   facet_wrap(~Substrate) +
   theme_minimal() +
   theme(
@@ -45,14 +45,15 @@ Itaconic_df <- df %>%
 #calculate mean for Sample ID replicates
 mean_absorbance <- Itaconic_df %>% 
   group_by(Sample.ID, Dilution) %>% 
-  summarise(across(starts_with("Hr_"), mean, na.rm  = TRUE)) %>% 
-  ungroup
+  summarise(across(starts_with("Hr_"), mean, na.rm  = TRUE)) 
 
 mean_absorbance_long <- mean_absorbance %>%
   pivot_longer(cols = starts_with("Hr_"), 
                names_to = "Time", 
                values_to = "Mean_Absorbance") %>%
   mutate(Time = as.numeric(gsub("Hr_", "", Time)))
+
+mean_absorbance_long
 
 #plot
 ggplot(mean_absorbance_long) +
