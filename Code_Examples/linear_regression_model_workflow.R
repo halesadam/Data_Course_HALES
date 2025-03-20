@@ -23,10 +23,10 @@ iris %>% ggpairs(mapping = c("Species","Sepal.Length"))
 # Build possible models ####
 
 # lm() is linear model. There are LOTS of other model types
-mod1 <- lm(data=iris, formula = Sepal.Length ~ Sepal.Width)
-mod2 <- lm(data=iris, formula = Sepal.Length ~ Sepal.Width + Species)
-mod3 <- lm(data=iris, formula = Sepal.Length ~ Sepal.Width * Species)
-
+mod1 <- lm(data=iris, formula = Sepal.Length ~ Sepal.Width) #species not considered
+mod2 <- lm(data=iris, formula = Sepal.Length ~ Sepal.Width + Species) #sepal width and species
+mod3 <- lm(data=iris, formula = Sepal.Length ~ Sepal.Width * Species) #let y int and slope vary based on species
+#sepal length as a function of sepal width and species and the interaction between sepal width and species
 
 
 # Look at model summaries ####
@@ -34,17 +34,21 @@ summary(mod1)
 summary(mod2)
 summary(mod3)
 
+
 # how to interpret results?
 # Coefficients, P-values, Adjusted R-squared
 
-
 # Look at model diagnostics ####
+# this is where we use Lindia
 gg_diagnose(mod1)
 gg_diagnose(mod2)
 gg_diagnose(mod3)
 
 
 # Compare models ####
+#anova is how you compare two models to see if they are different
+#anova helps you to determine if you need the seperate models
+#large p value? Pick between them bc they are telling the same story
 anova(mod1, mod2) # different?
 anova(mod1, mod3)
 anova(mod2, mod3)
@@ -83,7 +87,6 @@ ggplot(df,aes(x=Sepal.Width,color=Species)) +
   theme_bw()
 
 # which model is best?
-
 
 # Using mtcars #
 skim(mtcars)
