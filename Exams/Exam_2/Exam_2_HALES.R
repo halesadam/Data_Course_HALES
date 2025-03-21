@@ -26,6 +26,9 @@ ggplot(dat_tidy)+
   facet_wrap(~Continent) +
   theme_bw()
 
+#view plot
+p1
+
 #4. Save plot
 ggsave("HALES_Plot_1.png", plot = p1, width = 10, height = 6, dpi = 300)
 
@@ -42,6 +45,9 @@ ggplot(dat_mean) +
       color = Continent) +
   geom_line(size = 1.0) + 
   theme_bw()
+
+#view plot
+p2
 
 #6. Save the plot
 ggsave("HALES_Plot_2.png", plot = p2, width = 10, height = 6, dpi = 300)
