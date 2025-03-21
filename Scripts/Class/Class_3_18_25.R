@@ -23,7 +23,7 @@ mod2 %>% summary()
 
 mod3 <- 
   iris %>% glm(data = .,
-               formula = Sepal.Length ~ Species * Sepal.Width) # * is an interactive term, learn the interaction betwen the two
+               formula = Sepal.Length ~ Species * Sepal.Width)# * is an interactive term, learn the interaction betwen the two
 
 summary(mod3)
 

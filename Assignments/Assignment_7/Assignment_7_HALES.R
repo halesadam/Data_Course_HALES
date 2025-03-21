@@ -10,25 +10,23 @@ dat <- read.csv("Utah_Religions_by_County.csv") %>%
 
 #Lengthen Dataset
 #rename religious to proportion_religious
-dat <- dat %>% 
-  pivot_longer(cols = -c(county, pop_2010,religious),
+dat_long <- dat %>% 
+  pivot_longer(cols = -c(county, pop_2010),
                names_to = "religion",
-               values_to = "proportion") %>% 
-  rename("proportion_religious" = religious)
+               values_to = "proportion")
 
 #Explore religious affiliations across the state 
-ggplot(dat)+
+ggplot(dat_long)+
   aes(x = religion, y = proportion) +
   geom_col() + 
   theme(
     axis.text.x = element_text(angle = 90)
   )
-
-
+#wow, not surprising
 
 #Let's make a column titled "count" which is the product of pop and proportion
-#this serves as a count of people following that religion
-dat1 <- dat %>% 
+#this serves as a count of followers for a given religion
+dat1 <- dat_long %>% 
   mutate(count = as.integer(pop_2010 * proportion)) #used as.integer for whole numbers bc we are dealing with people
 
 #use this new column to see count of relig. by county and total county population
@@ -42,6 +40,13 @@ ggplot(dat1)+
   )
 
 ##Task1
+#Does population of a county correlate with the proportion of any specific religious group in that county?
+ggplot(dat_long)+
+  aes(x = religion, 
+      y  = )
+cor(dat$, dat$religious)
+
+
 # Compute correlation and p-values for each religion
 cor_results <- dat %>%
   group_by(religion) %>%
@@ -54,16 +59,15 @@ cor_results <- dat %>%
 # Print the results
 print(cor_results)
 
-# Find the religion with the strongest correlation
-strongest_religion <- cor_results$religion[which.max(abs(cor_results$correlation))]
+#wow, muslim has a correlation of 0.759 and a p value of <0.05
 
-# Plot the strongest correlation
+# Plot this correlation
 ggplot(dat %>% filter(religion == strongest_religion), aes(x = pop_2010, y = proportion)) +
   geom_point() +
   geom_smooth(method = "lm", se = FALSE, color = "blue") +
-  labs(title = paste("Population vs", strongest_religion, "Proportion"),
+  labs(title = paste("Population vs Muslim Population"),
        x = "County Population",
-       y = paste(strongest_religion, "Proportion")) +
+       y = "Muslim Proportion") +
   theme_minimal()
 
 
