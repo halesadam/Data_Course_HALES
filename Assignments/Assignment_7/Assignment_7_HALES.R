@@ -24,6 +24,7 @@ ggplot(dat_long)+
   )
 #wow, not surprising
 
+
 #Let's make a column titled "count" which is the product of pop and proportion
 #this serves as a count of followers for a given religion
 dat1 <- dat_long %>% 
@@ -41,37 +42,34 @@ ggplot(dat1)+
 
 ##Task1
 #Does population of a county correlate with the proportion of any specific religious group in that county?
-ggplot(dat_long)+
-  aes(x = religion, 
-      y  = )
-cor(dat$, dat$religious)
-
-
-# Compute correlation and p-values for each religion
-cor_results <- dat %>%
+#Compute correlation for each religion
+cor_results <- dat_long %>%
   group_by(religion) %>%
   summarize(
-    correlation = cor(pop_2010, proportion, use = "complete.obs"),
-    p_value = cor.test(pop_2010, proportion, use = "complete.obs")$p.value
+    correlation = cor(pop_2010, proportion)
   ) %>%
-  arrange(desc(abs(correlation)))  # Sort by absolute correlation strength
+  arrange(desc(abs(correlation))) 
 
 # Print the results
 print(cor_results)
+#interesting, muslim has the highest correlation
 
-#wow, muslim has a correlation of 0.759 and a p value of <0.05
-
-# Plot this correlation
-ggplot(dat %>% filter(religion == strongest_religion), aes(x = pop_2010, y = proportion)) +
+#plot 
+ggplot(cor_results)+
+  aes(x = religion, y = correlation) +
   geom_point() +
-  geom_smooth(method = "lm", se = FALSE, color = "blue") +
-  labs(title = paste("Population vs Muslim Population"),
-       x = "County Population",
-       y = "Muslim Proportion") +
-  theme_minimal()
+  theme(
+    axis.text.x = element_text(angle = 90)
+  ) +
+  labs(
+    title = "Correlation of Religion and Population",
+    y = "Religion",
+    x = "Correlation"
+  )
 
 
-
+##Task2
+#does proportion of a specific religion in a county correlate with proportion of non-religious
 
 
 
