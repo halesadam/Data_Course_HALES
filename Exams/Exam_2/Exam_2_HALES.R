@@ -90,7 +90,7 @@ dat_tidy <- dat_tidy %>%
   mutate(Model = str_replace(Model, "predict_mod", "mod"))
 
 #plot predictions
-ggplot(dat_tidy)+
+p3 <- ggplot(dat_tidy)+ #save plot as p3
   aes(x = Year,
       y = Predicted_U5MR,
       color = Continent) + 
@@ -103,6 +103,12 @@ ggplot(dat_tidy)+
     color = "Continent"
   ) + 
   theme_bw()
+
+#view the plot
+p3
+
+#save the plot
+ggsave("HALES_Model_Predict_Plot.png", plot = p3, width = 10, height = 6, dpi = 300)
 
 #10. Bonus
 
