@@ -117,5 +117,28 @@ p3
 ggsave("HALES_Model_Predict_Plot.png", plot = p3, width = 10, height = 6, dpi = 300)
 
 #10. Bonus
+ecuador_2020 <- 
+  data.frame(Continent = "Americas",
+             Year = 2020,
+             Country_Name = "Ecudor")
 
+#prediction based on mod3
+ecuador_2020$pred <- predict(object = mod3, newdata = ecuador_2020)
 
+#real value
+ecuador_2020$actual <- 13
+
+#what is the error and predicted value
+ecuador_2020$error <- abs(ecuador_2020$pred - ecuador_2020$actual)
+
+#view
+ecuador_2020
+
+#build an improved model
+mod4 <- glm(U5MR ~ Year * Continent, family = gaussian(link = "log"), data = dat_tidy)
+
+#predict with this model
+ecuador_2020$revised_predict <- predict(mod4, newdata = ecuador_2020, type = "response")
+
+#View
+ecuador_2020
