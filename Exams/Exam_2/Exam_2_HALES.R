@@ -120,7 +120,7 @@ ggsave("HALES_Model_Predict_Plot.png", plot = p3, width = 10, height = 6, dpi = 
 ecuador_2020 <- 
   data.frame(Continent = "Americas",
              Year = 2020,
-             Country_Name = "Ecudor")
+             Country_Name = "Ecuador")
 
 #prediction based on mod3
 ecuador_2020$pred <- predict(object = mod3, newdata = ecuador_2020)
