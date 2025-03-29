@@ -36,7 +36,7 @@ ggplot(dat)+
   aes(x = Nitrogen, y =GrowthRate)+
   geom_point()+
   facet_wrap(~Species)
-# AHH...why does cornucopiae have to haeve so many mushrooms that grow good no matter what
+# AHH...why does cornucopiae have to have so many mushrooms that grow well no matter what
 # silly biology
 
 #make 4 models to explain dependent variable "Growth Rate"
@@ -87,7 +87,7 @@ mod5 <-
 compare_performance(mod1, mod2, mod3, mod4, mod5)
 #dang, mod5 wasn't any better even with the cleaning up
 
-#Okay, just for fun, what about a:
+#what about non-linear models
 #Tree based model
 mod6 <- 
   ranger(data = dat,
@@ -105,14 +105,41 @@ ggplot(dat)+
 #wow, I like that better
 
 
+#nonlinear modeling 
+#read in .csv (I put a copy in the assignment_8 folder)
+non_linear <- read_csv("non_linear_relationship.csv")
+
+#make a simple linear model
+mod_lm <- lm(response ~ predictor, data = non_linear)
+
+#summary of model
+summary(mod_lm)
+
+#plot model
+ggplot(non_linear, aes(x = predictor, y = response)) +
+  geom_point(color = "steelblue", size = 1) +  
+  geom_smooth(method = "lm", se = FALSE, color = "black", linewidth = 1) +  
+  ggtitle("Linear Model Fit") +
+  theme_minimal()
+#that sucks
+#let's try something else
+
+# Fit linear model to log-transformed response
+model_log <- lm(log(response) ~ predictor, data = non_linear)
+
+#predictions
+non_linear$pred_log <- exp(predict(model_log))
+
+# Plot
+ggplot(non_linear, aes(x = predictor)) +
+  geom_point(aes(y = response), color = "steelblue", size = 1) +
+  geom_line(aes(y = pred_log), color = "black", linewidth = 1) +
+  ggtitle("Log-Transformed Linear Model (Exponential Fit)") +
+  theme_minimal()
+#much better
 
 
-#what about non-linear models
-model_gam <- gam(GrowthRate ~ s(Light) + s(Temperature) + Humidity + Species, data = dat)
-summary(model_gam)
 
-# Plot smooth terms
-plot(model_gam, pages = 1)
 
 
 

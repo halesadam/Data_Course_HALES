@@ -1,0 +1,46 @@
+1. Are any of your predicted response values from your best model scientifically meaningless? Explain.
+
+Yes, it looks like anything that had to do with nitrogen and its interactions with other values was statistically non significant. This is interesting though, as I (a novice mycologist) would think that the nitrogen would help increase growth rate. I am simply speculating, but it looks as though temp and humidity are simply more important for mushroom growth rate as opposed to nitrogen. 
+
+2. In your plots, did you find any non-linear relationships? Do a bit of research online and give a link to at least one resource explaining how to deal with modeling non-linear relationships in R.
+
+Yes, the scatter plot showing Growth rate and nitrogen was not a linear relationship. It seemed to be almost a bell curve with an ideal rate of nitrogen in the middle. 
+
+The link below was a article written on decision trees using R
+https://www.pluralsight.com/resources/blog/guides/non-linear-regression-trees-with-r
+
+
+3. Write the code you would use to model the data found in “/Data/non_linear_relationship.csv” with a linear model (there are a few ways of doing this)
+
+#nonlinear modeling 
+#read in .csv (I put a copy in the assignment_8 folder)
+non_linear <- read_csv("non_linear_relationship.csv")
+
+#make a simple linear model
+mod_lm <- lm(response ~ predictor, data = non_linear)
+
+#summary of model
+summary(mod_lm)
+
+#plot model
+ggplot(non_linear, aes(x = predictor, y = response)) +
+  geom_point(color = "steelblue", size = 1) +  
+  geom_smooth(method = "lm", se = FALSE, color = "black", linewidth = 1) +  
+  ggtitle("Linear Model Fit") +
+  theme_minimal()
+#that sucks
+#let's try something else
+
+# Fit linear model to log-transformed response
+model_log <- lm(log(response) ~ predictor, data = non_linear)
+
+#predictions
+non_linear$pred_log <- exp(predict(model_log))
+
+# Plot
+ggplot(non_linear, aes(x = predictor)) +
+  geom_point(aes(y = response), color = "steelblue", size = 1) +
+  geom_line(aes(y = pred_log), color = "black", linewidth = 1) +
+  ggtitle("Log-Transformed Linear Model (Exponential Fit)") +
+  theme_minimal()
+#much better
