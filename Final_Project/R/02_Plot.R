@@ -118,7 +118,7 @@ p3_1_DSR_by_sp <- ggplot(df_season1)+
     y = "DSR"
   )
 
-ggsave("./Plots/p3_1_DSR_by_sp.png", plot = p2, width = 10, height = 6, dpi = 300)
+ggsave("./Plots/p3_1_DSR_by_sp.png", plot = p3_1_DSR_by_sp, width = 10, height = 6, dpi = 300)
 
 #same for season 2
 p3_2_DSR_by_sp <- ggplot(df_season2)+
@@ -132,10 +132,10 @@ p3_2_DSR_by_sp <- ggplot(df_season2)+
     y = "DSR"
   )
 
-ggsave("./Plots/p3_2_DSR_by_sp.png", plot = p2, width = 10, height = 6, dpi = 300)
+ggsave("./Plots/p3_2_DSR_by_sp.png", plot = p3_2_DSR_by_sp, width = 10, height = 6, dpi = 300)
 
 #two seasons combined
-pe_3_DSR_by_sp <- ggplot(df_clean)+
+p_3_DSR_by_sp <- ggplot(df_clean)+
   aes(x = Species, y = DSR, fill = Species)+
   geom_boxplot(alpha = 0.8, color = "black") +
   scale_fill_brewer(palette = "Paired") +
@@ -146,7 +146,7 @@ pe_3_DSR_by_sp <- ggplot(df_clean)+
     y = "DSR"
   )
 
-ggsave("./Plots/p3_3_DSR_by_sp.png", plot = p2, width = 10, height = 6, dpi = 300)
+ggsave("./Plots/p3_3_DSR_by_sp.png", plot = p_3_DSR_by_sp, width = 10, height = 6, dpi = 300)
 
 #4.Make col plot showing number of sp.
 #dataset is long format - keep only unique accessions
