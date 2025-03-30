@@ -1,7 +1,7 @@
 # Cleaning
 
 ## Setup
-library(dplyr)
+library(tidyverse)
 library(tidyr)
 library(tidyverse)
 library(skimr)
@@ -52,13 +52,6 @@ df_long <- df_long %>%
 #remove B prefix in Block
 df_long$Block <- gsub("^B", "", df_long$Block)
 
-#change DSR to an integer, Rep to factor, Block to factor
-df_long <- df_long %>% 
-  mutate(DSR = as.integer(DSR)) %>% 
-  mutate(Rep = as.factor(Rep)) %>% 
-  mutate(Block = as.factor(Block)) %>% 
-  mutate(DSR = ifelse(DSR == 16, NA_integer_, DSR))
-
 #look over df_long for problems
 skim(data = df_long)
 
@@ -84,22 +77,22 @@ origin_df$ID <- str_replace(origin_df$ID, "^S24-", "")
 #remove Brassica prefix from species column
 origin_df$Species <- str_replace(origin_df$Species, "^Brassica ","")
 
+#keep a copy of Accession for table later on
+Accession <- origin_df
+
 #drop accession column, not necessary for this - only useful for book keeping
 origin_df <- origin_df %>% 
-  select(-Accession)
+  dplyr::select(-Accession)
 
 #save cleaned origin data set
 write.csv(origin_df, "./Data/cleaned_origin_sheet.csv", row.names = FALSE)
-
+#save copy with long accession number
+write.csv(Accession, "./Data/cleaned_origin_sheet_Accession.csv", row.names = FALSE)
 
 #combine the two 
 #read in the two
 df_origin <- read.csv("./Data/cleaned_origin_sheet.csv", stringsAsFactors = FALSE)
 df_dsr <- read.csv("./Data/cleaned_DSR.csv", stringsAsFactors = FALSE)
-
-# Convert ID columns to the same type (character)
-df_origin$ID <- as.character(df_origin$ID)
-df_dsr$Accession_ID <- as.character(df_dsr$Accession_ID)
 
 #merge the two
 df_merged <- df_dsr %>%
@@ -108,11 +101,44 @@ df_merged <- df_dsr %>%
 #check up to see how it looks
 glimpse(df_merged)
 
-#neeed to set origin and species to factors - leave accession as character
-df_merged$Origin <- as.factor(df_merged$Origin)
-df_merged$Species <- as.factor(df_merged$Species)
-
 #save the merged data set
 write.csv(df_merged, "./Data/Merged_DSR_Origin_Dataset.csv", row.names = FALSE)
 
 
+#repeat this for one with Accession included:
+df_accession <- read.csv("./Data/cleaned_origin_sheet_Accession.csv", stringsAsFactors = FALSE)
+df_dsr <- read.csv("./Data/cleaned_DSR.csv", stringsAsFactors = FALSE)
+
+# Convert ID columns to the same type (character)
+df_accession$ID <- as.character(df_accession$ID)
+df_dsr$Accession_ID <- as.character(df_dsr$Accession_ID)
+
+#merge the two
+df_merged_1 <- df_dsr %>%
+  left_join(df_accession, by = c("Accession_ID" = "ID"))
+
+#save the merged data set
+write.csv(df_merged_1, "./Data/Merged_DSR_Origin_Dataset_Accession.csv", row.names = FALSE)
+
+
+
+#give me a list of the accessions that had the lowest average DSR
+low_dsr <- df_merged_1 %>%
+  filter(!is.na(DSR), !is.na(Species)) %>%
+  group_by(Accession_ID, Species) %>%
+  summarise(Avg_DSR = mean(DSR, na.rm = TRUE), .groups = "drop") %>%
+  arrange(Avg_DSR)
+
+write.csv(low_dsr, "./Data/low_dsr.csv", row.names = FALSE)
+
+#combine Accession in Merged with low DSR
+# Merge to get Accession names
+merged_low_dsr <- low_dsr %>%
+  left_join(df_merged_1 %>% select(Accession_ID, Accession), by = "Accession_ID") %>%
+  distinct(Accession_ID, .keep_all = TRUE)
+
+# View result
+print(merged_low_dsr)
+
+#save this to make table later on
+write.csv(merged_low_dsr, "./Data/low_dsr_with_accession", row.names = FALSE)
