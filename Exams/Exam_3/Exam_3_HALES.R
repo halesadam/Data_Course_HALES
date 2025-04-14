@@ -21,8 +21,8 @@ p1_dat<-
   facet_wrap(~Tier)+
   labs( 
     x = "Rank", 
-    y = "Salary", #change "Value" to "Salary"
-    fill = "Rank" #capitalize R in Rank
+    y = "Salary", 
+    fill = "Rank" 
   ) + 
   theme_minimal() +
   theme(
