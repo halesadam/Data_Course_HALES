@@ -1,42 +1,9 @@
----
-title: "Exam 3"
-output: 
-  html_document:
-    theme: flatly
-    highlight: tango
-    toc: true
-    toc_depth: 4
-    toc_float:
-      collapsed: true
-      smooth_scroll: true
----
-Adam Hales
-
----
-
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
-```
-
-## Setup
-```{r}
 library(tidyverse)
 library(broom)
-```
 
----
-
-## Task 1
-
-### Read in csv
-```{r}
-#Read in csv 
+#1. 
 dat <- read.csv("FacultySalaries_1995.csv")
-```
 
-
-### Tidy data for plotting
-```{r}
 dat <- dat %>% 
   filter(Tier %in% c("I","IIA", "IIB")) %>% 
   select("Tier", "State",
@@ -46,11 +13,7 @@ dat <- dat %>%
   pivot_longer(cols = c("Full", "Assoc", "Assist"),
                names_to = "Rank",
                values_to = "Salary")
-```
 
-### Creating the Plot
-We want to make a boxplot showing the difference in salary for professors at different tiers of institutions. 
-```{r}
 p1_dat<- 
   ggplot(dat)+
   aes(x = Rank, y = Salary, fill = Rank)+
@@ -67,62 +30,31 @@ p1_dat<-
   ) 
 
 print(p1_dat)
-```
 
----
-
-## Task 2
-Given that cleaned data set, we will build an ANOVA model and display the summary. <br>
-This model will test the influence of "State" "Tier" and "Rank" on "Salary" but not interactions between predictors.
-
-```{r}
+#2. Build an ANOVA model and display results in your report
+# Test influence of "State" "Tier" and "Rank" on "Salary" but no interactions between predictors
 #verify factors are set before making model
 head(dat)
 #set factor levels
 dat$Tier <- factor(dat$Tier)
 dat$Rank <- factor(dat$Rank)
 
-#make model
 anova_mod <- aov(Salary ~ State + Tier + Rank, data = dat)
 
-#get model summary
 summary(anova_mod)
-```
-As you can see, state, tier, and rank are statistically significant predictors of professor salary. 
 
----
-
-## Task 3
-Now we will switch data to examine the juniper oils data set.
-```{r}
-#read in csv
+#3. 
 juniper <- read.csv("Juniper_Oils.csv")
-```
 
-### Select Necessary Info
-This data set has a bunch of stuff that we don't need. Let's clean it up. <br>
-We really only need the chemicals and years since burn. 
-```{r}
 important_juniper <- juniper %>% 
   select(YearsSinceBurn, alpha.pinene:thujopsenal)
-```
 
-### Tidy Data
-```{r}
 long_juniper <- important_juniper %>% 
   pivot_longer(cols = alpha.pinene:thujopsenal,
                names_to = "Chemical_name",
                values_to = "Concentration")
-```
 
-## Task 4
-Make a plot showing the following:
-   
-- x = YearsSinceBurn
-- y = Concentration
-- facet = ChemicalID (use free y-axis scales)
-
-```{r}
+#4. Make plot
 ggplot(long_juniper)+
   aes(x = YearsSinceBurn, y = Concentration)+
   facet_wrap(~Chemical_name, scales = "free_y")+
@@ -136,17 +68,9 @@ ggplot(long_juniper)+
     x = "Years Since Burn",
     y = "Concentration"
   )
-```
 
----
 
-## Task 5
-Use a generalized linear model (glm) to find which chemicals show concentrations that are significantly affected by years since burn.
-__Assume significance = p<0.05.__
-
-To do this, I chose to make one large model and then narrow it down based on significant predictors.
-
-```{r}
+#5. Model
 #Make one big model and then we can clean it up later
 juniper_mod_big <- glm(Concentration ~ YearsSinceBurn * Chemical_name, 
                        data = long_juniper)
@@ -159,5 +83,3 @@ significant_chemicals <- mod_output %>%
   filter(p.value < 0.05) #filter for significance
 
 print(significant_chemicals)
-```
-
