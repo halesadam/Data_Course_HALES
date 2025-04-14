@@ -1,0 +1,211 @@
+---
+title: "Exam 3"
+output: 
+  html_document:
+    theme: flatly
+    highlight: tango
+    toc: true
+    toc_depth: 4
+    toc_float:
+      collapsed: true
+      smooth_scroll: true
+---
+Adam Hales
+
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
+```
+
+## Setup
+```{r}
+#Load necessary packages
+library(tidyverse)
+library(janitor)
+library(broom)
+```
+
+---
+
+## Task 1
+```{r}
+#Read in csv and clean names
+faculty <- read.csv("FacultySalaries_1995.csv") %>% clean_names()
+```
+
+<details>
+<summary>Click to view glimpse of faculty data</summary>
+
+```{r}
+glimpse(faculty)
+```
+</details>
+
+### Tidy Data
+```{r}
+#Make a column titled "info" and a column associated with that called "value"
+faculty_long <- faculty %>% 
+  pivot_longer(cols = starts_with("avg_")|starts_with("num_"),
+               names_to = "info",
+               values_to = "value")
+
+#Extract necessary information from info column
+#this includes prof rank and indicates if it is salary or compensation
+faculty_long <- faculty_long %>% mutate(
+  rank = case_when(
+    str_detect(info, "full_prof") ~ "Full",
+    str_detect(info, "assoc_prof") ~ "Assoc",
+    str_detect(info, "assist_prof") ~ "Assist",
+    str_detect(info, "_all") ~ "All",
+    TRUE ~ NA_character_
+  ),
+  info_type = case_when(
+    str_detect(info, "salary") ~ "salary",
+    str_detect(info, "comp") ~ "compensation",
+    str_detect(info, "num") ~ "num_faculty",
+    TRUE ~ NA_character_
+  )
+)
+
+#select only "salary" for plotting
+#exclude rows where column equals V11B
+#exclude All from rank
+faculty_long_salary <- faculty_long %>% 
+  filter(info_type %in% c("salary")) %>% 
+  filter(tier != "VIIB") %>% 
+  filter(rank != "All")
+
+#drop info_type and fed_id for the purpose of the tidyness and rename value to salary
+salary <- faculty_long_salary %>% 
+  select(-c(info, info_type, fed_id)) %>% #dropped info column as it was repetitive
+  rename(salary = value) %>% 
+  mutate(tier = as.factor(tier), #set tier, state, and rank as factors - useful for model 
+         state = as.factor(state),
+         rank = as.factor(rank))
+
+```
+
+### Creating the Plot
+We want to make a boxplot showing the difference in salary for professors at different tiers of institutions. 
+```{r}
+p1_salary <- ggplot(salary)+
+  aes(x = rank, y = salary, fill = rank)+
+  geom_boxplot()+
+  facet_wrap(~tier)+
+  labs(
+    title = "Professor Salary Based on Rank and Institution Tier",
+    x = "Rank", 
+    y = "Salary", #change "Value" to "Salary"
+    fill = "Rank" #capitalize R in Rank
+  ) + 
+  theme_minimal() +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust=1)
+  ) 
+
+print(p1_salary)
+```
+
+---
+
+## Task 2
+Given that cleaned data set, we will build an ANOVA model and display the summary. <br>
+This model will test the influence of "State" "Tier" and "Rank" on "Salary" but not interactions between predictors.
+
+```{r}
+#Verify factors and integers are right prior to making model
+head(salary) #univ_name is a character but that's okay 
+
+anova_mod <- aov(salary ~ state + tier + rank, data = salary)
+
+summary(anova_mod)
+```
+As you can see, state, tier, and rank are statistically significant predictors of professor salary. 
+
+---
+
+## Task 3
+Now we will switch data to examine the juniper oils data set.
+```{r}
+#Read in csv and clean names
+juniper <- read.csv("./Juniper_Oils.csv") %>%  clean_names()
+```
+
+<details>
+<summary>Click to view glimpse of juniper data</summary>
+
+```{r}
+glimpse(juniper)
+```
+</details>
+
+
+### Tidy Data
+```{r}
+#There are a lot of columns here we really don't need. Let's only select what we do need.
+important_juniper <- juniper %>% 
+  select(c(sample_id, alpha_pinene:thujopsenal, years_since_burn)) #use sequence operator
+
+#Now we can clean it up
+long_important_juniper <- important_juniper %>% 
+  pivot_longer(cols = alpha_pinene:thujopsenal, #Sequence operator again
+               names_to = "chemical",
+               values_to = "concentration")
+
+#Look at tidy data
+head(long_important_juniper)
+```
+
+---
+
+## Task 4
+Make a plot of the following:
+
+- x = YearsSinceBurn
+- y = Concentration
+- facet = ChemicalID
+
+```{r}
+#Make plot
+p2_juniper <- ggplot(long_important_juniper)+
+  aes(x = years_since_burn, y = concentration)+
+  facet_wrap(~chemical, scales = "free_y")+
+  geom_smooth(color = "blue")+
+  theme_minimal() +
+  theme(
+    strip.text = element_text(size = 7) #make facet text smaller
+  ) +
+  labs(
+    title = "Chemical Concentrations and Years Since Burn",
+    x = "Years Since Burn",
+    y = "Concentration"
+  )
+
+#View the plot
+print(p2_juniper)
+```
+
+---
+
+## Task 5
+Use a generalized linear model (glm) to find which chemicals show concentrations that are significantly affected by years since burn.
+__Assume significance = p<0.05.__
+
+To do this, I chose to make one large model and then narrow it down based on significant predictors.
+
+```{r}
+#Make one big model and then we can clean it up later
+juniper_mod_big <- glm(concentration ~ years_since_burn * chemical, 
+                       data = long_important_juniper)
+
+#tidy model output
+mod_output <- tidy(juniper_mod_big)
+
+#filter for significant interactions
+significant_chemicals <- mod_output %>% 
+  filter(p.value < 0.05) #filter for significance
+
+print(significant_chemicals)
+```
+
