@@ -3,42 +3,50 @@
 
 #Load needed libraries
 library(tidyverse)
-library(janitor)
-library(broom)
+library(janitor) #used to clean names
+library(broom) #used for tidy() function
 
 #1.- Recreate the Graph
 #read in csv and clean names
 faculty <- read.csv("FacultySalaries_1995.csv") %>% clean_names()
 
+#view
+View(faculty)
+
 #view the data
 head(faculty)
 
-#tidy data
-#make a column titled info and a column associated with that called value
-faculty_long <- faculty %>% 
-  pivot_longer(cols = starts_with("avg_")|starts_with("num_"),
-               names_to = "info",
-               values_to = "value")
+#Tidy data
+#Lengthen dataset 
+#Make cols that include info and value
+faculty_long <- faculty %>%
+  pivot_longer(
+    cols = matches("^avg_|^num_"), #starts with "avg_" or "num_"
+    names_to = "info",
+    values_to = "value"
+  )
 
 View(faculty_long) #getting there
 
 #Extract necessary information from info column
-#this includes prof rank and indicates if it is salary or compensation
-faculty_long <- faculty_long %>% mutate(
+#This includes prof rank - need to set as Full, Assoc, or Assist per figure
+#Also need to see if the info is salary, compensation, or number/count
+faculty_long <- 
+  faculty_long %>% 
+  mutate(
   rank = case_when(
     str_detect(info, "full_prof") ~ "Full",
-    str_detect(info, "assoc_prof") ~ "Assoc",
-    str_detect(info, "assist_prof") ~ "Assist",
+    str_detect(info, "assoc_prof") ~ "Assoc", #abbreviations to match figure
+    str_detect(info, "assist_prof") ~ "Assist", 
     str_detect(info, "_all") ~ "All",
-    TRUE ~ NA_character_
+    TRUE ~ NA_character_ #catches NAs 
   ),
   info_type = case_when(
     str_detect(info, "salary") ~ "salary",
     str_detect(info, "comp") ~ "compensation",
     str_detect(info, "num") ~ "num_faculty",
     TRUE ~ NA_character_
-  )
-)
+  ))
 
 #select only "salary" for plotting
 #exclude rows where column equals V11B
@@ -48,7 +56,7 @@ faculty_long_salary <- faculty_long %>%
   filter(tier != "VIIB") %>% 
   filter(rank != "All")
 
-#drop info_type and fed_id for the purpose of the tidyness and rename value to salary
+#Drop info_type and fed_id for the purpose of the tidyness and rename value to salary
 salary <- faculty_long_salary %>% 
   select(-c(info, info_type, fed_id)) %>% #dropped info column as it was repetitive
   rename(salary = value) %>% 

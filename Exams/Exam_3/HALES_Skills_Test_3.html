@@ -1577,8 +1577,8 @@ border-radius: 0px;
 <h2>Setup</h2>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="co">#Load necessary packages</span></span>
 <span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
-<span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a><span class="fu">library</span>(janitor)</span>
-<span id="cb1-4"><a href="#cb1-4" tabindex="-1"></a><span class="fu">library</span>(broom)</span></code></pre></div>
+<span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a><span class="fu">library</span>(janitor) <span class="co">#used to clean names</span></span>
+<span id="cb1-4"><a href="#cb1-4" tabindex="-1"></a><span class="fu">library</span>(broom) <span class="co">#used for tidy() function</span></span></code></pre></div>
 <hr />
 </div>
 <div id="task-1" class="section level2">
@@ -1612,45 +1612,49 @@ Click to view glimpse of faculty data
 </details>
 <div id="tidy-data" class="section level3">
 <h3>Tidy Data</h3>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a><span class="co">#Make a column titled &quot;info&quot; and a column associated with that called &quot;value&quot;</span></span>
-<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a>faculty_long <span class="ot">&lt;-</span> faculty <span class="sc">%&gt;%</span> </span>
-<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="at">cols =</span> <span class="fu">starts_with</span>(<span class="st">&quot;avg_&quot;</span>)<span class="sc">|</span><span class="fu">starts_with</span>(<span class="st">&quot;num_&quot;</span>),</span>
-<span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a>               <span class="at">names_to =</span> <span class="st">&quot;info&quot;</span>,</span>
-<span id="cb5-5"><a href="#cb5-5" tabindex="-1"></a>               <span class="at">values_to =</span> <span class="st">&quot;value&quot;</span>)</span>
-<span id="cb5-6"><a href="#cb5-6" tabindex="-1"></a></span>
-<span id="cb5-7"><a href="#cb5-7" tabindex="-1"></a><span class="co">#Extract necessary information from info column</span></span>
-<span id="cb5-8"><a href="#cb5-8" tabindex="-1"></a><span class="co">#this includes prof rank and indicates if it is salary or compensation</span></span>
-<span id="cb5-9"><a href="#cb5-9" tabindex="-1"></a>faculty_long <span class="ot">&lt;-</span> faculty_long <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(</span>
-<span id="cb5-10"><a href="#cb5-10" tabindex="-1"></a>  <span class="at">rank =</span> <span class="fu">case_when</span>(</span>
-<span id="cb5-11"><a href="#cb5-11" tabindex="-1"></a>    <span class="fu">str_detect</span>(info, <span class="st">&quot;full_prof&quot;</span>) <span class="sc">~</span> <span class="st">&quot;Full&quot;</span>,</span>
-<span id="cb5-12"><a href="#cb5-12" tabindex="-1"></a>    <span class="fu">str_detect</span>(info, <span class="st">&quot;assoc_prof&quot;</span>) <span class="sc">~</span> <span class="st">&quot;Assoc&quot;</span>,</span>
-<span id="cb5-13"><a href="#cb5-13" tabindex="-1"></a>    <span class="fu">str_detect</span>(info, <span class="st">&quot;assist_prof&quot;</span>) <span class="sc">~</span> <span class="st">&quot;Assist&quot;</span>,</span>
-<span id="cb5-14"><a href="#cb5-14" tabindex="-1"></a>    <span class="fu">str_detect</span>(info, <span class="st">&quot;_all&quot;</span>) <span class="sc">~</span> <span class="st">&quot;All&quot;</span>,</span>
-<span id="cb5-15"><a href="#cb5-15" tabindex="-1"></a>    <span class="cn">TRUE</span> <span class="sc">~</span> <span class="cn">NA_character_</span></span>
-<span id="cb5-16"><a href="#cb5-16" tabindex="-1"></a>  ),</span>
-<span id="cb5-17"><a href="#cb5-17" tabindex="-1"></a>  <span class="at">info_type =</span> <span class="fu">case_when</span>(</span>
-<span id="cb5-18"><a href="#cb5-18" tabindex="-1"></a>    <span class="fu">str_detect</span>(info, <span class="st">&quot;salary&quot;</span>) <span class="sc">~</span> <span class="st">&quot;salary&quot;</span>,</span>
-<span id="cb5-19"><a href="#cb5-19" tabindex="-1"></a>    <span class="fu">str_detect</span>(info, <span class="st">&quot;comp&quot;</span>) <span class="sc">~</span> <span class="st">&quot;compensation&quot;</span>,</span>
-<span id="cb5-20"><a href="#cb5-20" tabindex="-1"></a>    <span class="fu">str_detect</span>(info, <span class="st">&quot;num&quot;</span>) <span class="sc">~</span> <span class="st">&quot;num_faculty&quot;</span>,</span>
-<span id="cb5-21"><a href="#cb5-21" tabindex="-1"></a>    <span class="cn">TRUE</span> <span class="sc">~</span> <span class="cn">NA_character_</span></span>
-<span id="cb5-22"><a href="#cb5-22" tabindex="-1"></a>  )</span>
-<span id="cb5-23"><a href="#cb5-23" tabindex="-1"></a>)</span>
-<span id="cb5-24"><a href="#cb5-24" tabindex="-1"></a></span>
-<span id="cb5-25"><a href="#cb5-25" tabindex="-1"></a><span class="co">#select only &quot;salary&quot; for plotting</span></span>
-<span id="cb5-26"><a href="#cb5-26" tabindex="-1"></a><span class="co">#exclude rows where column equals V11B</span></span>
-<span id="cb5-27"><a href="#cb5-27" tabindex="-1"></a><span class="co">#exclude All from rank</span></span>
-<span id="cb5-28"><a href="#cb5-28" tabindex="-1"></a>faculty_long_salary <span class="ot">&lt;-</span> faculty_long <span class="sc">%&gt;%</span> </span>
-<span id="cb5-29"><a href="#cb5-29" tabindex="-1"></a>  <span class="fu">filter</span>(info_type <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">&quot;salary&quot;</span>)) <span class="sc">%&gt;%</span> </span>
-<span id="cb5-30"><a href="#cb5-30" tabindex="-1"></a>  <span class="fu">filter</span>(tier <span class="sc">!=</span> <span class="st">&quot;VIIB&quot;</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb5-31"><a href="#cb5-31" tabindex="-1"></a>  <span class="fu">filter</span>(rank <span class="sc">!=</span> <span class="st">&quot;All&quot;</span>)</span>
-<span id="cb5-32"><a href="#cb5-32" tabindex="-1"></a></span>
-<span id="cb5-33"><a href="#cb5-33" tabindex="-1"></a><span class="co">#drop info_type and fed_id for the purpose of the tidyness and rename value to salary</span></span>
-<span id="cb5-34"><a href="#cb5-34" tabindex="-1"></a>salary <span class="ot">&lt;-</span> faculty_long_salary <span class="sc">%&gt;%</span> </span>
-<span id="cb5-35"><a href="#cb5-35" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span><span class="fu">c</span>(info, info_type, fed_id)) <span class="sc">%&gt;%</span> <span class="co">#dropped info column as it was repetitive</span></span>
-<span id="cb5-36"><a href="#cb5-36" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">salary =</span> value) <span class="sc">%&gt;%</span> </span>
-<span id="cb5-37"><a href="#cb5-37" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">tier =</span> <span class="fu">as.factor</span>(tier), <span class="co">#set tier, state, and rank as factors - useful for model </span></span>
-<span id="cb5-38"><a href="#cb5-38" tabindex="-1"></a>         <span class="at">state =</span> <span class="fu">as.factor</span>(state),</span>
-<span id="cb5-39"><a href="#cb5-39" tabindex="-1"></a>         <span class="at">rank =</span> <span class="fu">as.factor</span>(rank))</span></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a><span class="co">#Lengthen dataset </span></span>
+<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a><span class="co">#Make cols that include info and value</span></span>
+<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a>faculty_long <span class="ot">&lt;-</span> faculty <span class="sc">%&gt;%</span></span>
+<span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(</span>
+<span id="cb5-5"><a href="#cb5-5" tabindex="-1"></a>    <span class="at">cols =</span> <span class="fu">matches</span>(<span class="st">&quot;^avg_|^num_&quot;</span>), <span class="co">#starts with &quot;avg_&quot; or &quot;num_&quot;</span></span>
+<span id="cb5-6"><a href="#cb5-6" tabindex="-1"></a>    <span class="at">names_to =</span> <span class="st">&quot;info&quot;</span>,</span>
+<span id="cb5-7"><a href="#cb5-7" tabindex="-1"></a>    <span class="at">values_to =</span> <span class="st">&quot;value&quot;</span>)</span>
+<span id="cb5-8"><a href="#cb5-8" tabindex="-1"></a></span>
+<span id="cb5-9"><a href="#cb5-9" tabindex="-1"></a><span class="co">#Extract necessary information from info column</span></span>
+<span id="cb5-10"><a href="#cb5-10" tabindex="-1"></a><span class="co">#This includes prof rank - need to set as Full, Assoc, or Assist per figure</span></span>
+<span id="cb5-11"><a href="#cb5-11" tabindex="-1"></a><span class="co">#Also need to see if the info is salary, compensation, or number/count</span></span>
+<span id="cb5-12"><a href="#cb5-12" tabindex="-1"></a>faculty_long <span class="ot">&lt;-</span> </span>
+<span id="cb5-13"><a href="#cb5-13" tabindex="-1"></a>  faculty_long <span class="sc">%&gt;%</span> </span>
+<span id="cb5-14"><a href="#cb5-14" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb5-15"><a href="#cb5-15" tabindex="-1"></a>  <span class="at">rank =</span> <span class="fu">case_when</span>(</span>
+<span id="cb5-16"><a href="#cb5-16" tabindex="-1"></a>    <span class="fu">str_detect</span>(info, <span class="st">&quot;full_prof&quot;</span>) <span class="sc">~</span> <span class="st">&quot;Full&quot;</span>,</span>
+<span id="cb5-17"><a href="#cb5-17" tabindex="-1"></a>    <span class="fu">str_detect</span>(info, <span class="st">&quot;assoc_prof&quot;</span>) <span class="sc">~</span> <span class="st">&quot;Assoc&quot;</span>, <span class="co">#abbreviations to match figure</span></span>
+<span id="cb5-18"><a href="#cb5-18" tabindex="-1"></a>    <span class="fu">str_detect</span>(info, <span class="st">&quot;assist_prof&quot;</span>) <span class="sc">~</span> <span class="st">&quot;Assist&quot;</span>, </span>
+<span id="cb5-19"><a href="#cb5-19" tabindex="-1"></a>    <span class="fu">str_detect</span>(info, <span class="st">&quot;_all&quot;</span>) <span class="sc">~</span> <span class="st">&quot;All&quot;</span>,</span>
+<span id="cb5-20"><a href="#cb5-20" tabindex="-1"></a>    <span class="cn">TRUE</span> <span class="sc">~</span> <span class="cn">NA_character_</span> <span class="co">#catches NAs </span></span>
+<span id="cb5-21"><a href="#cb5-21" tabindex="-1"></a>  ),</span>
+<span id="cb5-22"><a href="#cb5-22" tabindex="-1"></a>  <span class="at">info_type =</span> <span class="fu">case_when</span>(</span>
+<span id="cb5-23"><a href="#cb5-23" tabindex="-1"></a>    <span class="fu">str_detect</span>(info, <span class="st">&quot;salary&quot;</span>) <span class="sc">~</span> <span class="st">&quot;salary&quot;</span>,</span>
+<span id="cb5-24"><a href="#cb5-24" tabindex="-1"></a>    <span class="fu">str_detect</span>(info, <span class="st">&quot;comp&quot;</span>) <span class="sc">~</span> <span class="st">&quot;compensation&quot;</span>,</span>
+<span id="cb5-25"><a href="#cb5-25" tabindex="-1"></a>    <span class="fu">str_detect</span>(info, <span class="st">&quot;num&quot;</span>) <span class="sc">~</span> <span class="st">&quot;num_faculty&quot;</span>,</span>
+<span id="cb5-26"><a href="#cb5-26" tabindex="-1"></a>    <span class="cn">TRUE</span> <span class="sc">~</span> <span class="cn">NA_character_</span></span>
+<span id="cb5-27"><a href="#cb5-27" tabindex="-1"></a>  ))</span>
+<span id="cb5-28"><a href="#cb5-28" tabindex="-1"></a></span>
+<span id="cb5-29"><a href="#cb5-29" tabindex="-1"></a><span class="co">#select only &quot;salary&quot; for plotting</span></span>
+<span id="cb5-30"><a href="#cb5-30" tabindex="-1"></a><span class="co">#exclude rows where column equals V11B</span></span>
+<span id="cb5-31"><a href="#cb5-31" tabindex="-1"></a><span class="co">#exclude All from rank</span></span>
+<span id="cb5-32"><a href="#cb5-32" tabindex="-1"></a>faculty_long_salary <span class="ot">&lt;-</span> faculty_long <span class="sc">%&gt;%</span> </span>
+<span id="cb5-33"><a href="#cb5-33" tabindex="-1"></a>  <span class="fu">filter</span>(info_type <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">&quot;salary&quot;</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb5-34"><a href="#cb5-34" tabindex="-1"></a>  <span class="fu">filter</span>(tier <span class="sc">!=</span> <span class="st">&quot;VIIB&quot;</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb5-35"><a href="#cb5-35" tabindex="-1"></a>  <span class="fu">filter</span>(rank <span class="sc">!=</span> <span class="st">&quot;All&quot;</span>)</span>
+<span id="cb5-36"><a href="#cb5-36" tabindex="-1"></a></span>
+<span id="cb5-37"><a href="#cb5-37" tabindex="-1"></a><span class="co">#drop info_type and fed_id for the purpose of the tidyness and rename value to salary</span></span>
+<span id="cb5-38"><a href="#cb5-38" tabindex="-1"></a>salary <span class="ot">&lt;-</span> faculty_long_salary <span class="sc">%&gt;%</span> </span>
+<span id="cb5-39"><a href="#cb5-39" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span><span class="fu">c</span>(info, info_type, fed_id)) <span class="sc">%&gt;%</span> <span class="co">#dropped info column as it was repetitive</span></span>
+<span id="cb5-40"><a href="#cb5-40" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">salary =</span> value) <span class="sc">%&gt;%</span> </span>
+<span id="cb5-41"><a href="#cb5-41" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">tier =</span> <span class="fu">as.factor</span>(tier), <span class="co">#set tier, state, and rank as factors - useful for model </span></span>
+<span id="cb5-42"><a href="#cb5-42" tabindex="-1"></a>         <span class="at">state =</span> <span class="fu">as.factor</span>(state),</span>
+<span id="cb5-43"><a href="#cb5-43" tabindex="-1"></a>         <span class="at">rank =</span> <span class="fu">as.factor</span>(rank))</span></code></pre></div>
 </div>
 <div id="creating-the-plot" class="section level3">
 <h3>Creating the Plot</h3>
